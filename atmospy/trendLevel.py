@@ -21,7 +21,7 @@ def generate_data(years=6):
     return df.iloc[::-1].reset_index(drop=True)
     
 # def trendLevel(mydata, pollutant, x, y, statistic='avg'):
-def trendLevel(mydata, pollutant, x, y, type, n_levels=(10, 10, 4), labels=None, breaks=None, statistic='avg', title=None):
+def trendLevel(mydata, pollutant, x, y, category_type, n_levels=(10, 10, 4), labels=None, breaks=None, statistic='avg', title=None):
     """
     openair trendLevel R function adapted into python.
 
@@ -47,23 +47,32 @@ def trendLevel(mydata, pollutant, x, y, type, n_levels=(10, 10, 4), labels=None,
     """
 
     pollutant_categorical = False
-    if (labels and breaks):
+    if labels and breaks:
         pollutant_categorical = True
 
     # Check valid input
-
+    if x not in mydata.columns:
+        raise Exception(f'{x} does not exist in df')
+    if y not in mydata.columns:
+        raise Exception(f'{y} does not exist in df')
+    if pollutant not in mydata.columns:
+        raise Exception(f'{pollutant} does not exist in df')
+    # if category_type not in mydata.columns:
+    #     raise Exception(f'{category_type} does not exist in df')
+    if not len(set([x, y, category_type])) == len([x, y, category_type]):
+        raise Exception(f'x, y and type cannot match')
+    
     # type cutting
-    min_type, max_type = min(mydata[type]), max(mydata[type])
+    min_type, max_type = min(mydata[category_type]), max(mydata[category_type])
     bins = np.linspace(min_type, max_type, num=n_levels[2])
-    print(bins)
-    indicies = np.searchsorted(bins, mydata[type])
+    indicies = np.searchsorted(bins, mydata[category_type])
     facet = []
     # TODO: edge cases where only 1 bin, have to check
     for i in indicies:
         start = i
         if start == len(bins) - 1:
             start -= 1
-        facet.append(f"{type} {bins[start]} to {bins[start+1]}")
+        facet.append(f"{category_type} {bins[start]} to {bins[start+1]}")
     mydata['facet'] = facet
 
     fig = px.density_heatmap(mydata,
@@ -89,4 +98,11 @@ def trendLevel(mydata, pollutant, x, y, type, n_levels=(10, 10, 4), labels=None,
     fig.show()
 
 # df = pd.read_pickle('tests/datafiles/test_csvs/test.pckl')
+# Extract more granular time from timestamp
+# dates = pd.DatetimeIndex(df['timestamp'])
+# df['minute'] = dates.minute
+# df['hour'] = dates.hour
+# df['year'] = dates.year
+# trendLevel(df, 'no2', 'hour', 'minute', 'year', n_levels=(24, 60, 2), title='Test Air Data')
+
 trendLevel(generate_data(), 'pollutant', 'month', 'hour', 'year', n_levels=(12, 24, 6), title='Testing TrendLevel w/ Generated Data')
