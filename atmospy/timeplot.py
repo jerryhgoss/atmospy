@@ -28,7 +28,7 @@ def time_plot(mydata, x, y, title=None):
         raise Exception(f'{y} does not exist in df')
 
     
-    fig = px.line(mydata, x = 'timestamp', y = 'pm1', title='Test')
+    fig = px.line(mydata, x, y, title)
 
     fig.show()
 
