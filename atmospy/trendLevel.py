@@ -27,6 +27,7 @@ def add_common_date_time(df):
     df['second'] = dates.second
     df['minute'] = dates.minute
     df['hour'] = dates.hour
+    df['day'] = dates.day
     df['month'] = dates.month
     df['year'] = dates.year
     
@@ -39,7 +40,7 @@ def trendLevel(mydata, pollutant, x, y, category_type, n_levels=(10, 10, 4), sta
     the concentration of one pollutant can to shown as a function of
     three other categorical properties.
 
-    Currently does not have provide custom statistic method or categorical color scale
+    TODO: differentiate holes (empty x, y cases), categorical color scale, provide custom statistic method
 
     Original: https://github.com/davidcarslaw/openair/blob/master/R/trendLevel.R
     
@@ -113,8 +114,9 @@ def trendLevel(mydata, pollutant, x, y, category_type, n_levels=(10, 10, 4), sta
 
     fig.show()
 
-# df = pd.read_pickle('tests/datafiles/test_csvs/test.pckl')
-# add_common_date_time(df)
-# trendLevel(df, 'no2', 'hour', 'minute', 'year', n_levels=(24, 60, 2), title='Test Air Data')
+if __name__ == "__main__":
+    df = pd.read_pickle('tests/datafiles/SN000-046/2021_1_27_2021_3_31.pckl')
+    add_common_date_time(df)
+    print(df)
+    trendLevel(df1, 'neph_pm10', 'hour', 'minute', 'day', n_levels=(24, 60, 8), statistic='min', title='Min PM10 from 10/1/21 - 10/9/21')
 
-trendLevel(generate_data(), 'pollutant', 'month', 'hour', 'year', n_levels=(12, 24, 1), statistic='avg', title='Testing TrendLevel w/ Generated Data')
